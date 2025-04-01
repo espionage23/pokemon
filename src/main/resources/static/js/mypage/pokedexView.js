@@ -28,20 +28,32 @@ function getUrlParameter(name) {
 // 포켓몬 상세 정보 로드 함수
 function loadPokemonDetails(pokemonId) {
     $.ajax({
-        url: `/data/pokemon/${pokemonId}`,
+        url: `/data/pokemon/details/${pokemonId}`,
         method: 'GET',
-        success: function(pokemon) {
-            console.log('포켓몬 상세 정보:', pokemon);
-            // 포켓몬 기본 정보 표시
-            updatePokemonInfo(pokemon);
-            
-            // 진화 정보 로드 (evolutionId가 있는 경우)
-            if (pokemon.evolutionId) {
-                loadEvolutionChain(pokemon.evolutionId);
+        success: function(response) {
+            if (response.status === "success") {
+                const details = response.data;
+                console.log('포켓몬 상세 정보:', details);
+                
+                // 포켓몬 기본 정보 표시 (pokemon 객체는 details.pokemon에 있음)
+                updatePokemonInfo(details.pokemon);
+                
+                // 타입 정보 표시
+                updateTypeInfo(details.types);
+                
+                // 진화 정보 로드 - 포켓몬의 evolutionId 사용
+                if (details.pokemon && details.pokemon.evolutionId) {
+                    // 포켓몬의 evolutionId를 사용하여 진화 트리 로드
+                    console.log('포켓몬의 진화 ID:', details.pokemon.evolutionId);
+                    loadEvolutionChain(details.pokemon.evolutionId);
+                } else {
+                    console.error('포켓몬의 진화 정보가 없습니다.');
+                    const evolutionTable = $('#evolution-tree table');
+                    evolutionTable.html('<tr><td colspan="2">진화 정보가 없습니다.</td></tr>');
+                }
             } else {
-                console.error('포켓몬의 진화 ID가 없습니다.');
-                const evolutionTable = $('#evolution-tree table');
-                evolutionTable.html('<tr><td colspan="2">진화 정보가 없습니다.</td></tr>');
+                console.error('포켓몬 정보를 불러오는데 실패했습니다:', response);
+                $('.pokedexView-table').first().html('<tr><td colspan="2">포켓몬 정보를 불러오는데 실패했습니다.</td></tr>');
             }
         },
         error: function(error) {
@@ -84,15 +96,11 @@ function updatePokemonInfo(pokemon) {
         </tr>
     `);
     
-    // 타입 행 추가
-    let typeText = '정보 없음';
-    if (pokemon.types && pokemon.types.length > 0) {
-        typeText = pokemon.types.map(type => type.name).join(', ');
-    }
+    // 타입 행 추가 - 타입 정보는 별도로 처리
     infoTable.append(`
         <tr>
             <td><strong>타입</strong></td>
-            <td>${typeText}</td>
+            <td><div id="pokemon-types"></div></td>
         </tr>
     `);
     
@@ -112,14 +120,6 @@ function updatePokemonInfo(pokemon) {
         </tr>
     `);
     
-    // 성별 행 추가
-    infoTable.append(`
-        <tr>
-            <td><strong>성별</strong></td>
-            <td>${pokemon.gender || '정보 없음'}</td>
-        </tr>
-    `);
-    
     // 설명 추가
     if (pokemon.flavorText) {
         infoTable.append(`
@@ -128,6 +128,24 @@ function updatePokemonInfo(pokemon) {
                 <td>${pokemon.flavorText}</td>
             </tr>
         `);
+    }
+}
+
+// 타입 정보 업데이트 함수 - 전역 스코프로 이동
+function updateTypeInfo(types) {
+    const typeContainer = $('#pokemon-types');
+    typeContainer.empty();
+    
+    if (types && types.length > 0) {
+        types.forEach((type, index) => {
+            typeContainer.append(`<span class="type-badge type-${type.name.toLowerCase()}">${type.name}</span>`);
+            // 마지막 요소가 아니면 쉼표 추가
+            if (index < types.length - 1) {
+                typeContainer.append(', ');
+            }
+        });
+    } else {
+        typeContainer.text('정보 없음');
     }
 }
 
@@ -214,4 +232,6 @@ function updateEvolutionInfo(evolutionData) {
         // 카드 카운트 증가
         currentCardCount++;
     });
+
+
 }

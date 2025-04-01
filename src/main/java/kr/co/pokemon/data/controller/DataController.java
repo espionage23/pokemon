@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import kr.co.pokemon.data.dto.DataStatusDTO;
 import kr.co.pokemon.data.dto.PageRequestDTO;
+import kr.co.pokemon.data.dto.PokemonDetailsDTO;
 import kr.co.pokemon.data.dto.TableInfoDTO;
 import kr.co.pokemon.data.service.DataService;
 import kr.co.pokemon.item.dto.ItemCategoryDTO;
@@ -212,7 +214,13 @@ public class DataController {
 				.map(ResponseEntity::ok)
 				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
-	
+
+	@GetMapping("/pokemon/details/{pokemonId}")
+	public DataStatusDTO<PokemonDetailsDTO> getPokemonDetails(@PathVariable int pokemonId) {
+		PokemonDetailsDTO details = dataService.getPokemonDetails(pokemonId);
+		return new DataStatusDTO<>("success", details);
+	}
+
 	@GetMapping(value = "/pokemon/evolution/{evolutionId}")
 	public ResponseEntity<List<PokemonDTO>> getPokemonsByEvolutionId(@PathVariable int evolutionId) {
 		return ResponseEntity.ok(dataService.getPokemonsByEvolutionId(evolutionId));
