@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import kr.co.pokemon.data.dto.PageRequestDTO;
+import kr.co.pokemon.data.dto.PokemonDetailsDTO;
 import kr.co.pokemon.data.dto.TableInfoDTO;
 import kr.co.pokemon.pokemon.dto.PokemonDTO;
 
@@ -31,4 +32,6 @@ public interface DataService {
 	boolean recreateSequence(String tableName);
 
 	List<PokemonDTO> getPokemonsByEvolutionId(int evolutionId);
+
+	PokemonDetailsDTO getPokemonDetails(int pokemonId);
 }

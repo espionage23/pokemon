@@ -407,7 +407,7 @@ CREATE TABLE ingame_enemy (
 );
 
 CREATE TABLE SDUNGEON(
-    id VARCHAR2(50) PRIMARY KEY,
+    id VARCHAR2(30) PRIMARY KEY,
     gameMoney INT DEFAULT 0,
     daily_clear_count INT DEFAULT 0,
     weekly_clear_count INT DEFAULT 0,
@@ -420,9 +420,9 @@ CREATE TABLE SDUNGEON(
     pokemon2_img VARCHAR2(255) DEFAULT 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png',
     pokemon3_id NUMBER(10) DEFAULT 7,
     pokemon3_name VARCHAR2(100) DEFAULT '꼬북이',
-    pokemon3_img VARCHAR2(255) DEFAULT 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/7.png'
-	
-	CONSTRAINT fk_sdungeon_player FOREIGN KEY (id) REFERENCES player (id) ON DELETE CASCADE
+    pokemon3_img VARCHAR2(255) DEFAULT 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/7.png',
+    
+    CONSTRAINT fk_sdungeon_player FOREIGN KEY (id) REFERENCES player (id) ON DELETE CASCADE
 );
 
 CREATE SEQUENCE types_relationship_seq

@@ -21,10 +21,15 @@ import jakarta.annotation.PostConstruct;
 import kr.co.pokemon.data.dao.DataInfoMapper;
 import kr.co.pokemon.data.dto.DataDeleteDTO;
 import kr.co.pokemon.data.dto.PageRequestDTO;
+import kr.co.pokemon.data.dto.PokemonDetailsDTO;
 import kr.co.pokemon.data.dto.TableInfoDTO;
 import kr.co.pokemon.data.model.DBTables;
+import kr.co.pokemon.play.dto.PokemonOwnType;
+import kr.co.pokemon.pokemon.dto.EvolutionDTO;
 import kr.co.pokemon.pokemon.dto.PokemonDTO;
+import kr.co.pokemon.pokemon.service.EvolutionService;
 import kr.co.pokemon.pokemon.service.PokemonService;
+import kr.co.pokemon.pokemon.service.TypesService;
 
 @Service
 public class DataServiceImpl implements DataService {
@@ -165,5 +170,18 @@ public class DataServiceImpl implements DataService {
 	public List<PokemonDTO> getPokemonsByEvolutionId(int evolutionId) {
 		PokemonService pokemonService = applicationContext.getBean(PokemonService.class);
 		return pokemonService.getPokemonsByEvolutionId(evolutionId);
+	}
+
+	@Override
+	public PokemonDetailsDTO getPokemonDetails(int pokemonId) {
+		PokemonService pokemonService = applicationContext.getBean(PokemonService.class);
+		TypesService typesService = applicationContext.getBean(TypesService.class);
+		EvolutionService evolutionService = applicationContext.getBean(EvolutionService.class);
+		
+		// pokemonService 사용
+		PokemonDTO pokemon = pokemonService.getById(pokemonId);
+		List<PokemonOwnType> types = typesService.getTypesByPokemonId(pokemonId);
+		EvolutionDTO evolution = evolutionService.getById(pokemonId);
+		return new PokemonDetailsDTO(pokemon, types, evolution);
 	}
 }
